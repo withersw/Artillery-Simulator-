@@ -1,0 +1,3 @@
+/Users/wadewithers/Desktop/Fall 2023/Encapsulation Design/230.07.Lab.GLDemo (1)/cmake-build-debug/CMakeFiles/230_07_Lab_GLDemo__1_.dir
+/Users/wadewithers/Desktop/Fall 2023/Encapsulation Design/230.07.Lab.GLDemo (1)/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/wadewithers/Desktop/Fall 2023/Encapsulation Design/230.07.Lab.GLDemo (1)/cmake-build-debug/CMakeFiles/rebuild_cache.dir
