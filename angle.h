@@ -66,6 +66,12 @@ public:
         return *this;
     }
 
+    Angle& operator+=(const double & rhs)
+    {
+        radians += rhs;
+        return *this;
+    }
+
     // Negative Operator
     Angle operator-() const
     {
@@ -152,25 +158,3 @@ private:
 
     double radians;
 };
-
-
-// Insertion Operator
-ostream & operator<<(ostream & out, const Angle & rhs)
-{
-    out.setf(ios::fixed | ios::showpoint);
-    out.precision(1);
-    out << rhs.getDegrees();
-    return out;
-}
-
-// Extraction Operator
-istream & operator>>(istream & in, Angle & rhs)
-{
-    double newAngle;
-    in >> newAngle;
-    if (!in.fail()){
-        rhs.radians = rhs.convertToRadians(newAngle);
-    }
-    return in;
-}
-
