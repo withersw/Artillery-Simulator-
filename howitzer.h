@@ -14,18 +14,21 @@ class Howitzer {
 public:
 
     // Constructors
-    Howitzer(): position(0.0,0.0), angle(), projectile(nullptr){}
-    Howitzer(Position position): position(position), angle(), projectile(nullptr){}
+    Howitzer(): position(0.0,0.0), angle(), projectile(nullptr), canShoot(true){}
+    Howitzer(Position position): position(position), angle(), projectile(nullptr), canShoot(true){}
 
     // Getters
-    Position getPosition();
+    Position & getPosition();
     Angle getAngle();
     int* getProjectile();
+    bool getCanShoot() const;
 
     // Setters
-    void setPosition(Position newPosition);
-    void setAngle(Angle newAngle);
+    void setPosition(const Position& newPosition);
+    void setAngle(const Angle& newAngle);
     void setProjectile(int* newProjectile);
+
+    void setPixelX(double pixelX);
 
     /*
      * Move the muzzle according to a given angle.
@@ -37,10 +40,15 @@ public:
      */
     void fireProjectile();
 
+    void resetProjectile();
+
+    void checkProjectile();
+
 private:
     Position position;
     Angle angle;
     int * projectile;
+    bool canShoot;
 };
 
 

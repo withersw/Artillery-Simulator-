@@ -308,12 +308,12 @@ void ogstream :: drawHowitzer(const Position & pos, double angle, double age)
    PT pointsMuzzleFlash[10][2] =
    {
       { {-11,21}, {11,21} },      // least intense
-      { {-11,19}, {11,19} },     
+      { {-11,19}, {11,19} },
       { {-15,20}, {15,20} },
       { { -7,21}, { 7,21} },
-      { { -7,19}, { 7,19} },     
-      { {-10,20}, {10,20} },     
-      { { -2,21}, { 2,21} },     
+      { { -7,19}, { 7,19} },
+      { {-10,20}, {10,20} },
+      { { -2,21}, { 2,21} },
       { { -2,19}, { 2,19} },
       { { -5,20}, { 5,20} },
       { { -2,20}, { 2,20} }      // most intense
@@ -332,24 +332,24 @@ void ogstream :: drawHowitzer(const Position & pos, double angle, double age)
 
    // Now for the muzzle flash
    if (age >= 0.0 && age < 2.0) // flash duration in seconds
-   { 
-      // draw the muzzle flash
-      glBegin(GL_LINES);
+       {
+           // draw the muzzle flash
+           glBegin(GL_LINES);
 
-      for (int i = 0; i < 10; i++)
-      {
-         GLfloat color = (GLfloat)((10.0 - (double)i) / 10.0);
-         glColor3f(1.0 /* red % */, (GLfloat)color /* green % */, (GLfloat)color /* blue % */);
-         glVertexPoint(rotatePosition(pos, pointsMuzzleFlash[i][0].x,
-                                           pointsMuzzleFlash[i][0].y, angle));
-         glVertexPoint(rotatePosition(pos, pointsMuzzleFlash[i][1].x,
-                                           pointsMuzzleFlash[i][1].y, angle));
-      }
+           for (int i = 0; i < 10; i++)
+           {
+               GLfloat color = (GLfloat)((10.0 - (double)i) / 10.0);
+               glColor3f(1.0 /* red % */, (GLfloat)color /* green % */, (GLfloat)color /* blue % */);
+               glVertexPoint(rotatePosition(pos, pointsMuzzleFlash[i][0].x,
+                                            pointsMuzzleFlash[i][0].y, angle));
+               glVertexPoint(rotatePosition(pos, pointsMuzzleFlash[i][1].x,
+                                            pointsMuzzleFlash[i][1].y, angle));
+           }
 
-      // complete drawing of the muzzle flash
-      glResetColor();
-      glEnd();
-   }
+           // complete drawing of the muzzle flash
+           glResetColor();
+           glEnd();
+       }
 }
 
 /************************************************************************
