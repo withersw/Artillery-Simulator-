@@ -24,11 +24,16 @@ add_executable(230_07_Lab_GLDemo__1_
         uiInteract.cpp
         uiInteract.h
         angle.h
-        angle.cpp
         testAcceleration.h
         velocity.h
         velocity.cpp
-        testVelocity.h)
+        testVelocity.h
+        howitzer.cpp
+        howitzer.h
+        constants.h
+        projectile.h
+        projectile.h
+        projectile.cpp)
 
 target_link_libraries(230_07_Lab_GLDemo__1_ OpenGL::GL)
 
