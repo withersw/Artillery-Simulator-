@@ -8,25 +8,26 @@
 #pragma once
 #include "position.h"
 #include "angle.h"
+#include "projectile.h"
 
 class Howitzer {
 
 public:
 
     // Constructors
-    Howitzer(): position(0.0,0.0), angle(), projectile(nullptr), canShoot(true){}
-    Howitzer(Position position): position(position), angle(), projectile(nullptr), canShoot(true){}
+    Howitzer(): position(0.0,0.0), angle(), canShoot(true){}
+    Howitzer(Position position): position(position), angle(), canShoot(true){}
 
     // Getters
     Position & getPosition();
     Angle getAngle();
-    int* getProjectile();
+    Projectile getProjectile();
     bool getCanShoot() const;
 
     // Setters
     void setPosition(const Position& newPosition);
     void setAngle(const Angle& newAngle);
-    void setProjectile(int* newProjectile);
+    void setProjectile(Projectile newProjectile);
 
     void setPixelX(double pixelX);
 
@@ -44,10 +45,12 @@ public:
 
     void checkProjectile();
 
+    void updateProjectilePosition();
+
 private:
     Position position;
     Angle angle;
-    int * projectile;
+    Projectile  projectile;
     bool canShoot;
 };
 

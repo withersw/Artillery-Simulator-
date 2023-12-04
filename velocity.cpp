@@ -7,19 +7,17 @@
 #include "cmath"
 
 Velocity::Velocity(double velocity, Angle angle) {
-    this->velocity = velocity;
     this->verticalVelocity = computeVerticalVelocity(angle.getRadians(),velocity);
     this->horizontalVelocity = computeHorizontalVelocity(angle.getRadians(),velocity);
 }
 
 Velocity::Velocity(double verticalVelocity, double horizontalVelocity) {
-    this->velocity = sqrt(pow(verticalVelocity, 2) + pow(horizontalVelocity, 2));
     this->verticalVelocity = verticalVelocity;
     this->horizontalVelocity = horizontalVelocity;
 }
 
 double Velocity::getVelocity() {
-    return this->velocity;
+    return sqrt(pow(verticalVelocity, 2) + pow(horizontalVelocity, 2));;
 }
 
 double Velocity::getVerticalVelocity() {
@@ -30,9 +28,9 @@ double Velocity::getHorizontalVelocity() {
     return this->horizontalVelocity;
 }
 
-void Velocity::setVelocity(double newVelocity) {
-    this->velocity = newVelocity;
-}
+//void Velocity::setVelocity(double newVelocity) {
+//    this->velocity = newVelocity;
+//}
 
 void Velocity::setVerticalVelocity(double newVerticalVelocity) {
     this->verticalVelocity = newVerticalVelocity;

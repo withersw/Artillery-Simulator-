@@ -16,7 +16,7 @@ public:
     friend TestVelocity;
 
     // constructors
-    Velocity() : velocity(0.0), verticalVelocity(0.0), horizontalVelocity(0.0) {}
+    Velocity() : verticalVelocity(0.0), horizontalVelocity(0.0) {}
     Velocity(double velocity, Angle angle);
     Velocity(double verticalVelocity, double horizontalVelocity);
 
@@ -46,7 +46,6 @@ public:
     double computeHorizontalVelocity(double radians, double velocity);
 
 private:
-    double velocity;
     double verticalVelocity;
     double horizontalVelocity;
 

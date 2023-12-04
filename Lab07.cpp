@@ -17,8 +17,7 @@
 #include "ground.h"     // for GROUND
 #include "position.h"   // for POSITION
 #include "howitzer.h"   // Howitzer
-#include "testAcceleration.h" // for testing
-#include "testVelocity.h" // for testing
+
 using namespace std;
 
 /*************************************************************************
@@ -44,15 +43,15 @@ public:
       // This is to make the bullet travel across the screen. Notice how there are 
       // 20 pixels, each with a different age. This gives the appearance
       // of a trail that fades off in the distance.
-      for (int i = 0; i < 20; i++)
-      {
-         projectilePath[i].setPixelsX((double)i * 2.0);
-         projectilePath[i].setPixelsY(ptUpperRight.getPixelsY() / 1.5);
-      }
+//      for (int i = 0; i < 20; i++)
+//      {
+//         projectilePath[i].setPixelsX((double)i * 2.0);
+//         projectilePath[i].setPixelsY(ptUpperRight.getPixelsY() / 1.5);
+//      }
    }
 
    Ground ground;                 // the ground
-   Position  projectilePath[20];  // path of the projectile
+//   Position  projectilePath[20];  // path of the projectile
    Howitzer howitzer;
    Position  ptUpperRight;        // size of the screen
    double angle;                  // angle of the howitzer 
@@ -99,27 +98,9 @@ void callBack(const Interface* pUI, void* p)
    //
 
    // advance time by half a second.
-   pDemo->time += 0.5;
+   pDemo->time += 0.01;
 
-   // move the projectile across the screen
-   for (int i = 0; i < 20; i++)
-   {
-      // this bullet is moving left at 1 pixel per frame
-      double x = pDemo->projectilePath[i].getPixelsX();
-      x -= 1.0;
-      pDemo->howitzer.checkProjectile();
-      if (x < 0) {
-          x = pDemo->ptUpperRight.getPixelsX();
-          pDemo->howitzer.resetProjectile();
-      }
-      pDemo->projectilePath[i].setPixelsX(x);
-   }
-
-   //
-   // draw everything
-   //
-
-    ogstream gout(Position(10.0, pDemo->ptUpperRight.getPixelsY() - 20.0));
+   ogstream gout(Position(10.0, pDemo->ptUpperRight.getPixelsY() - 20.0));
 
    // draw the ground first
    pDemo->ground.draw(gout);
@@ -128,8 +109,12 @@ void callBack(const Interface* pUI, void* p)
    gout.drawHowitzer(pDemo->howitzer.getPosition(), pDemo->howitzer.getAngle().getRadians(), pDemo->time);
 
    // draw the projectile
-   for (int i = 0; i < 20; i++)
-      gout.drawProjectile(pDemo->projectilePath[i], 0.5 * (double)i);
+   if (!pDemo->howitzer.getCanShoot()){
+//       for (int i = 0; i < 20; i++)
+//           gout.drawProjectile(pDemo->projectilePath[i], 0.5 * (double)i);
+       pDemo->howitzer.updateProjectilePosition();
+       gout.drawProjectile(pDemo->howitzer.getProjectile().getPosition(), 0.5 * double(1));
+   }
 
    // draw some text on the screen
 
@@ -138,11 +123,11 @@ void callBack(const Interface* pUI, void* p)
        gout << "Angle: " << pDemo->howitzer.getAngle().getDegrees() << " degree\n";
    }else{
        gout.setPosition(Position(22000.0,18000.0));
-       gout << "altitude: " << "200" << "m\n";
+       gout << "altitude: " << pDemo->howitzer.getProjectile().getPosition().getMetersY() << "m\n";
        gout.setPosition(Position(22000.0,17000.0));
-       gout << "speed: " << "250" << "m/s\n";
+       gout << "speed: " << pDemo->howitzer.getProjectile().getVelocity().getVelocity() << "m/s\n";
        gout.setPosition(Position(22000.0,16000.0));
-       gout << "distance: " << "300" << "m\n";
+       gout << "distance: " << pDemo->howitzer.getProjectile().getPosition().getMetersX() << "m\n";
        gout.setPosition(Position(22000.0,15000.0));
        gout << "hang time: " << "30.2" << "s\n";
    }

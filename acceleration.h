@@ -5,6 +5,8 @@
 #ifndef INC_230_07_LAB_GLDEMO_1_ACCELERATION_H
 #define INC_230_07_LAB_GLDEMO_1_ACCELERATION_H
 
+#pragma once
+
 #include "angle.h"
 
 class TestAcceleration;
