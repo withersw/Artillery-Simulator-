@@ -4,6 +4,7 @@
 
 #define TIME 0.01
 #define DIAMETER 154.89
+#define SPEED 827.0
 
 #include "projectile.h"
 #include "constants.h"
@@ -12,7 +13,12 @@
 
 Projectile::Projectile() {}
 
-Projectile::Projectile(Position position) {}
+Projectile::Projectile(Position newPosition, Angle newAngle) {
+    this->position = newPosition;
+    this->angle = newAngle;
+    this->velocity.setVerticalVelocity(SPEED * cos(this->angle.getRadians()));
+    this->velocity.setHorizontalVelocity(SPEED * sin(this->angle.getRadians()));
+}
 
 /********************************
  * GETTERS
@@ -117,7 +123,7 @@ double Projectile::computeDistance(double originalPosition, double velocity, dou
 //    }
 //
 //    // If the result never received a value it means that is
-//    // higher than the last values so we will set both values
+//    // higher than the last values, so we will set both values
 //    // to the last value
 //    if (result.second == 0){
 //        result.first = current->first;
@@ -149,6 +155,8 @@ void Projectile::updatePosition() {
 
     Constants constants;
 
+    updateAngle();
+
     double altitude = position.getMetersY();
 
     // Update gravity from altitude.
@@ -164,6 +172,7 @@ void Projectile::updatePosition() {
             altitude);
 
     double currentSpeed = sqrt(pow(velocity.getVerticalVelocity(), 2) + pow(velocity.getVerticalVelocity(), 2));
+
 
     // Update speed of sound from altitude.
     altitudeSoundValues = constants.getValueFromConstants(altitude, constants.getSpeedOfSound());
@@ -181,16 +190,15 @@ void Projectile::updatePosition() {
     double dragCoefficient = updateDragCoefficient(altitude, currentSpeedMach, constants, machDragValues);
 
     // Compute total drag
-    double dragTotal = computeDrag(currentSpeed, airDensity, dragCoefficient, velocity.getVelocity());
+    double dragTotal = computeDrag(currentSpeed, airDensity, dragCoefficient);
 
-    acceleration.updateAccelerationFromDrag(dragTotal, angle);
+    acceleration.updateAccelerationFromDrag(dragTotal, this->angle);
 
     double netForce = - gravity - acceleration.getVerticalAcceleration();
 
     // Update velocity from acceleration.
-    velocity.updateVelocity(velocity.getVelocity(), acceleration.getAcceleration(), TIME);
-    velocity.computeVerticalVelocity(angle.getRadians(), velocity.getVelocity());
-    velocity.computeHorizontalVelocity(angle.getRadians(), velocity.getVelocity());
+    velocity.setVerticalVelocity(velocity.updateVelocity(velocity.getVerticalVelocity(),netForce,0.01));
+    velocity.setHorizontalVelocity(velocity.updateVelocity(velocity.getHorizontalVelocity(),this->acceleration.getHorizontalAcceleration(),0.01));
 
     // Update position of the projectile.
     position.setMetersX(computeDistance(position.getMetersX(), velocity.getHorizontalVelocity(), -acceleration.getHorizontalAcceleration(), TIME));
@@ -227,13 +235,13 @@ double Projectile::updateDragCoefficient(double altitude, double currentSpeedMac
     return dragCoefficient;
 }
 
-double Projectile::computeDrag(double currentSpeed, double airDensity, double dragCoefficient, double velocityComponent) {
+double Projectile::computeDrag(double currentSpeed, double airDensity, double dragCoefficient) {
     // Get area of projectile.
     double radiusMeters = (DIAMETER / 2)/1000;
     double area = M_PI * (radiusMeters * radiusMeters);
 
     // Compute drag
-    double drag = 0.5 * dragCoefficient * airDensity * (velocityComponent * velocityComponent) * area;
+    double drag = 0.5 * dragCoefficient * airDensity * (currentSpeed * currentSpeed) * area;
 
     return drag;;
 }

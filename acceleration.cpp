@@ -42,7 +42,6 @@ void Acceleration::setHorizontalAcceleration(double horizontlAcceleration) {
 
 void Acceleration::updateAccelerationFromDrag(double dragForce, Angle angle) {
     double accelerationChange = dragForce / MASS;
-    this->acceleration = this->acceleration - accelerationChange;
-    this->verticalAcceleration = cos(angle.getRadians()) * this->acceleration;
-    this->horizontalAcceleration = sin(angle.getRadians()) * this->acceleration;
+    this->verticalAcceleration = cos(angle.getRadians()) * accelerationChange;
+    this->horizontalAcceleration = sin(angle.getRadians()) * accelerationChange;
 }

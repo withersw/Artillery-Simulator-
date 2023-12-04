@@ -18,7 +18,7 @@ class Projectile {
 public:
     // Constructors
     Projectile();
-    Projectile(Position position);
+    Projectile(Position newPosition, Angle newAngle);
 
     // Getters
     Velocity getVelocity();
@@ -62,7 +62,7 @@ private:
 
     double updateDragCoefficient(double altitude, double currentSpeedMach, Constants constants, pair<double,double> machDragValues);
 
-    double computeDrag(double currentSpeed, double airDensity, double dragCoefficient, double VelocityComponent);
+    double computeDrag(double currentSpeed, double airDensity, double dragCoefficient);
 };
 
 

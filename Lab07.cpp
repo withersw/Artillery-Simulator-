@@ -16,8 +16,8 @@
 #include "uiDraw.h"     // for RANDOM and DRAW*
 #include "ground.h"     // for GROUND
 #include "position.h"   // for POSITION
-#include "testAcceleration.h" // for testing
-#include "testVelocity.h" // for testing
+#include "howitzer.h"   // Howitzer
+
 using namespace std;
 
 /*************************************************************************
@@ -31,27 +31,28 @@ public:
       ptUpperRight(ptUpperRight),
       ground(ptUpperRight),
       time(0.0),
-      angle(0.0)
+      angle(0.0),
+      howitzer()
    {
       // Set the horizontal position of the howitzer. This should be random.
-      ptHowitzer.setPixelsX(Position(ptUpperRight).getPixelsX() / 2.0);
+      howitzer.setPixelX(random(20,680));
 
       // Generate the ground and set the vertical position of the howitzer.
-      ground.reset(ptHowitzer);
+      ground.reset(howitzer.getPosition());
 
       // This is to make the bullet travel across the screen. Notice how there are 
       // 20 pixels, each with a different age. This gives the appearance
       // of a trail that fades off in the distance.
-      for (int i = 0; i < 20; i++)
-      {
-         projectilePath[i].setPixelsX((double)i * 2.0);
-         projectilePath[i].setPixelsY(ptUpperRight.getPixelsY() / 1.5);
-      }
+//      for (int i = 0; i < 20; i++)
+//      {
+//         projectilePath[i].setPixelsX((double)i * 2.0);
+//         projectilePath[i].setPixelsY(ptUpperRight.getPixelsY() / 1.5);
+//      }
    }
 
    Ground ground;                 // the ground
-   Position  projectilePath[20];  // path of the projectile
-   Position  ptHowitzer;          // location of the howitzer
+//   Position  projectilePath[20];  // path of the projectile
+   Howitzer howitzer;
    Position  ptUpperRight;        // size of the screen
    double angle;                  // angle of the howitzer 
    double time;                   // amount of time since the last firing
@@ -76,41 +77,28 @@ void callBack(const Interface* pUI, void* p)
 
    // move a large amount
    if (pUI->isRight())
-      pDemo->angle += 0.05;
+      pDemo->howitzer.moveMuzzle(0.05);
    if (pUI->isLeft())
-      pDemo->angle -= 0.05;
+      pDemo->howitzer.moveMuzzle(-0.05);
 
    // move by a little
    if (pUI->isUp())
-      pDemo->angle += (pDemo->angle >= 0 ? -0.003 : 0.003);
+      pDemo->howitzer.moveMuzzle(pDemo->howitzer.getAngle().getRadians() >= 0 ? -0.003 : 0.003);
    if (pUI->isDown())
-      pDemo->angle += (pDemo->angle >= 0 ? 0.003 : -0.003);
+      pDemo->howitzer.moveMuzzle(pDemo->howitzer.getAngle().getRadians() >= 0 ? 0.003 : -0.003);
 
    // fire that gun
-   if (pUI->isSpace())
-      pDemo->time = 0.0;
+   if (pUI->isSpace()){
+       pDemo->time = 0.0;
+       pDemo->howitzer.fireProjectile();
+   }
 
    //
    // perform all the game logic
    //
 
    // advance time by half a second.
-   pDemo->time += 0.5;
-
-   // move the projectile across the screen
-   for (int i = 0; i < 20; i++)
-   {
-      // this bullet is moving left at 1 pixel per frame
-      double x = pDemo->projectilePath[i].getPixelsX();
-      x -= 1.0;
-      if (x < 0)
-         x = pDemo->ptUpperRight.getPixelsX();
-      pDemo->projectilePath[i].setPixelsX(x);
-   }
-
-   //
-   // draw everything
-   //
+   pDemo->time += 0.01;
 
    ogstream gout(Position(10.0, pDemo->ptUpperRight.getPixelsY() - 20.0));
 
@@ -118,33 +106,34 @@ void callBack(const Interface* pUI, void* p)
    pDemo->ground.draw(gout);
 
    // draw the howitzer
-   gout.drawHowitzer(pDemo->ptHowitzer, pDemo->angle, pDemo->time);
+   gout.drawHowitzer(pDemo->howitzer.getPosition(), pDemo->howitzer.getAngle().getRadians(), pDemo->time);
 
    // draw the projectile
-   for (int i = 0; i < 20; i++)
-      gout.drawProjectile(pDemo->projectilePath[i], 0.5 * (double)i);
+   if (!pDemo->howitzer.getCanShoot()){
+//       for (int i = 0; i < 20; i++)
+//           gout.drawProjectile(pDemo->projectilePath[i], 0.5 * (double)i);
+       pDemo->howitzer.updateProjectilePosition();
+       gout.drawProjectile(pDemo->howitzer.getProjectile().getPosition(), 0.5 * double(1));
+   }
 
    // draw some text on the screen
-   gout.setf(ios::fixed | ios::showpoint);
-   gout.precision(1);
-   gout << "Time since the bullet was fired: "
-        << pDemo->time << "s\n";
+
+   if (pDemo->howitzer.getCanShoot()){
+       gout.setPosition(Position(22000.0,18000.0));
+       gout << "Angle: " << pDemo->howitzer.getAngle().getDegrees() << " degree\n";
+   }else{
+       gout.setPosition(Position(22000.0,18000.0));
+       gout << "altitude: " << pDemo->howitzer.getProjectile().getPosition().getMetersY() << "m\n";
+       gout.setPosition(Position(22000.0,17000.0));
+       gout << "speed: " << pDemo->howitzer.getProjectile().getVelocity().getVelocity() << "m/s\n";
+       gout.setPosition(Position(22000.0,16000.0));
+       gout << "distance: " << pDemo->howitzer.getProjectile().getPosition().getMetersX() << "m\n";
+       gout.setPosition(Position(22000.0,15000.0));
+       gout << "hang time: " << "30.2" << "s\n";
+   }
+
 }
 
-/************************************
- * TEST RUNNER
- * Run all unit tests for each class.
- ************************************/
-void runner()
-{
-    // Create objects of unit test classes.
-    TestAcceleration testA;
-    TestVelocity testV;
-
-    // Run unit tests for all classes.
-    testA.run();
-    testV.run();
-}
 
 double Position::metersFromPixels = 40.0;
 
@@ -163,22 +152,15 @@ int main(int argc, char** argv)
 #endif // !_WIN32
 {
     // Run unit tests.
-    runner();
 
-    // Display the tests passed if all tests pass.
-    cout << "All tests Passed!" << endl;
-
-    /*
    // Initialize OpenGL
    Position ptUpperRight;
    ptUpperRight.setPixelsX(700.0);
    ptUpperRight.setPixelsY(500.0);
-   Position().setZoom(40.0 /* 42 meters equals 1 pixel /);
-   */
+   Position().setZoom(40.0 /* 42 meters equals 1 pixel */);
 
-    /*
    Interface ui(0, NULL,
-      "Demo",   /* name on the window /
+      "Demo",   /* name on the window */
       ptUpperRight);
 
    // Initialize the demo
@@ -186,7 +168,6 @@ int main(int argc, char** argv)
 
    // set everything into action
    ui.run(callBack, &demo);
-   */
 
    return 0;
 }
