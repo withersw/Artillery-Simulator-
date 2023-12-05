@@ -15,12 +15,8 @@ Angle Howitzer::getAngle() {
     return this->angle;
 }
 
-Projectile Howitzer::getProjectile() {
+Projectile* Howitzer::getProjectile() {
     return this->projectile;
-}
-
-bool Howitzer::getCanShoot() const {
-    return this->canShoot;
 }
 
 /*
@@ -36,7 +32,7 @@ void Howitzer::setAngle(const Angle& newAngle) {
 }
 
 void Howitzer::setProjectile(Projectile newProjectile) {
-    this->projectile = newProjectile;
+    this->projectile = &newProjectile;
 }
 
 void Howitzer::setPixelX(double pixelX) {
@@ -61,13 +57,7 @@ void Howitzer::moveMuzzle(double radians) {
  */
 
 void Howitzer::fireProjectile() {
-    if (canShoot){
-        canShoot = false;
-        Projectile newProjectile(this->position,this->angle);
-//        int *newProjectile;
-//        newProjectile = &value;
-        this->projectile = newProjectile;
-    }
+    this->projectile = new Projectile(this->position,this->angle);
 }
 
 //void Howitzer::checkProjectile() {
@@ -76,11 +66,11 @@ void Howitzer::fireProjectile() {
 //    }
 //}
 
-//void Howitzer::resetProjectile() {
-//    this->projectile = nullptr;
-//}
+void Howitzer::resetProjectile() {
+    this->projectile = nullptr;
+}
 
 void Howitzer::updateProjectilePosition()
 {
-    this->projectile.moveProjectile();
+    this->projectile->moveProjectile();
 }
