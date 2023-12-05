@@ -96,9 +96,12 @@ void callBack(const Interface* pUI, void* p)
    //
    // perform all the game logic
    //
+//   if (pDemo->ground.getElevationMeters(pDemo->howitzer.getProjectile().getPosition()) == pDemo->howitzer.getProjectile().getPosition().getMetersY()) {
+//
+//   }
 
    // advance time by half a second.
-   pDemo->time += 0.01;
+   pDemo->time += 0.5;
 
    ogstream gout(Position(10.0, pDemo->ptUpperRight.getPixelsY() - 20.0));
 
@@ -113,6 +116,9 @@ void callBack(const Interface* pUI, void* p)
 //       for (int i = 0; i < 20; i++)
 //           gout.drawProjectile(pDemo->projectilePath[i], 0.5 * (double)i);
        pDemo->howitzer.updateProjectilePosition();
+//       if (pDemo->ground.getElevationMeters(pDemo->howitzer.getProjectile().getPosition()) != pDemo->howitzer.getProjectile().getPosition().getMetersY()) {
+//           gout.drawProjectile(pDemo->howitzer.getProjectile().getPosition(), 0.5 * double(1)); // comment this if we can't get it to work.
+//       }
        gout.drawProjectile(pDemo->howitzer.getProjectile().getPosition(), 0.5 * double(1));
    }
 
@@ -127,9 +133,9 @@ void callBack(const Interface* pUI, void* p)
        gout.setPosition(Position(22000.0,17000.0));
        gout << "speed: " << pDemo->howitzer.getProjectile().getVelocity().getVelocity() << "m/s\n";
        gout.setPosition(Position(22000.0,16000.0));
-       gout << "distance: " << pDemo->howitzer.getProjectile().getPosition().getMetersX() << "m\n";
+       gout << "distance: " << pDemo->howitzer.getProjectile().getPosition().getMetersX() - pDemo->howitzer.getPosition().getMetersX() << "m\n";
        gout.setPosition(Position(22000.0,15000.0));
-       gout << "hang time: " << "30.2" << "s\n";
+       gout << "hang time: " << pDemo->time << "s\n";
    }
 
 }

@@ -2,7 +2,7 @@
 // Created by Wade Withers on 12/1/23.
 //
 
-#define TIME 0.01
+#define TIME 0.5
 #define DIAMETER 154.89
 #define SPEED 827.0
 
@@ -197,8 +197,8 @@ void Projectile::updatePosition() {
     double netForce = - gravity - acceleration.getVerticalAcceleration();
 
     // Update velocity from acceleration.
-    velocity.setVerticalVelocity(velocity.updateVelocity(velocity.getVerticalVelocity(),netForce,0.01));
-    velocity.setHorizontalVelocity(velocity.updateVelocity(velocity.getHorizontalVelocity(),this->acceleration.getHorizontalAcceleration(),0.01));
+    velocity.setVerticalVelocity(velocity.updateVelocity(velocity.getVerticalVelocity(),netForce,0.5));
+    velocity.setHorizontalVelocity(velocity.updateVelocity(velocity.getHorizontalVelocity(),this->acceleration.getHorizontalAcceleration(),0.5));
 
     // Update position of the projectile.
     position.setMetersX(computeDistance(position.getMetersX(), velocity.getHorizontalVelocity(), -acceleration.getHorizontalAcceleration(), TIME));
