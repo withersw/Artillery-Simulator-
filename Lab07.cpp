@@ -50,6 +50,12 @@ public:
 //      }
    }
 
+   bool hitTheTarget(const Position& pos) const{
+       if(abs(ground.getTarget().getMetersY() - pos.getMetersY()) <= 500.0 && (abs(ground.getTarget().getMetersX() - pos.getMetersX()) <= 500.0))
+           return true;
+       return false;
+   }
+
    Ground ground;                 // the ground
 //   Position  projectilePath[20];  // path of the projectile
    Howitzer howitzer;
@@ -90,15 +96,13 @@ void callBack(const Interface* pUI, void* p)
    // fire that gun
    if (pUI->isSpace()){
        pDemo->time = 0.0;
-       pDemo->howitzer.fireProjectile();
+       if (pDemo->howitzer.getProjectile() == nullptr)
+           pDemo->howitzer.fireProjectile();
    }
 
    //
    // perform all the game logic
    //
-//   if (pDemo->ground.getElevationMeters(pDemo->howitzer.getProjectile().getPosition()) == pDemo->howitzer.getProjectile().getPosition().getMetersY()) {
-//
-//   }
 
    // advance time by half a second.
    pDemo->time += 0.5;
@@ -112,29 +116,39 @@ void callBack(const Interface* pUI, void* p)
    gout.drawHowitzer(pDemo->howitzer.getPosition(), pDemo->howitzer.getAngle().getRadians(), pDemo->time);
 
    // draw the projectile
-   if (!pDemo->howitzer.getCanShoot()){
+   if (pDemo->howitzer.getProjectile() != nullptr){
 //       for (int i = 0; i < 20; i++)
 //           gout.drawProjectile(pDemo->projectilePath[i], 0.5 * (double)i);
        pDemo->howitzer.updateProjectilePosition();
-//       if (pDemo->ground.getElevationMeters(pDemo->howitzer.getProjectile().getPosition()) != pDemo->howitzer.getProjectile().getPosition().getMetersY()) {
-//           gout.drawProjectile(pDemo->howitzer.getProjectile().getPosition(), 0.5 * double(1)); // comment this if we can't get it to work.
-//       }
-       gout.drawProjectile(pDemo->howitzer.getProjectile().getPosition(), 0.5 * double(1));
+       if(pDemo->hitTheTarget(pDemo->howitzer.getProjectile()->getPosition())){
+           pDemo->howitzer.resetProjectile();
+           pDemo->ground.reset(pDemo->howitzer.getPosition());
+       }
+       else if(pDemo->ground.getElevationMeters(pDemo->howitzer.getProjectile()->getPosition()) > pDemo->howitzer.getProjectile()->getPosition().getMetersY()) {
+           pDemo->howitzer.resetProjectile();
+       }else{
+           gout.drawProjectile(pDemo->howitzer.getProjectile()->getPosition(), 0.5 * double(1));
+//            Projectile* projectileArray = pDemo->howitzer.getProjectile();
+//           for (int i = 0; i < 20; ++i) {
+//               gout.drawProjectile(projectileArray[i].getPosition(), 0.5 * (double)i);
+//
+//           }
+       }
    }
 
    // draw some text on the screen
 
-   if (pDemo->howitzer.getCanShoot()){
+   if (pDemo->howitzer.getProjectile() == nullptr){
        gout.setPosition(Position(22000.0,18000.0));
        gout << "Angle: " << pDemo->howitzer.getAngle().getDegrees() << " degree\n";
    }else{
-       gout.setPosition(Position(22000.0,18000.0));
-       gout << "altitude: " << pDemo->howitzer.getProjectile().getPosition().getMetersY() << "m\n";
-       gout.setPosition(Position(22000.0,17000.0));
-       gout << "speed: " << pDemo->howitzer.getProjectile().getVelocity().getVelocity() << "m/s\n";
-       gout.setPosition(Position(22000.0,16000.0));
-       gout << "distance: " << pDemo->howitzer.getProjectile().getPosition().getMetersX() - pDemo->howitzer.getPosition().getMetersX() << "m\n";
-       gout.setPosition(Position(22000.0,15000.0));
+       gout.setPosition(Position(20000.0,18000.0));
+       gout << "altitude: " << pDemo->howitzer.getProjectile()->getPosition().getMetersY() << "m\n";
+       gout.setPosition(Position(20000.0,17000.0));
+       gout << "speed: " << pDemo->howitzer.getProjectile()->getVelocity().getVelocity() << "m/s\n";
+       gout.setPosition(Position(20000.0,16000.0));
+       gout << "distance: " << abs(pDemo->howitzer.getProjectile()->getPosition().getMetersX() - pDemo->howitzer.getPosition().getMetersX()) << "m\n";
+       gout.setPosition(Position(20000.0,15000.0));
        gout << "hang time: " << pDemo->time << "s\n";
    }
 
