@@ -9,19 +9,20 @@
 #include "position.h"
 #include "angle.h"
 #include "projectile.h"
+#include <vector>
 
 class Howitzer {
 
 public:
 
     // Constructors
-    Howitzer(): position(0.0,0.0), angle(){}
-    Howitzer(Position position): position(position), angle(){}
+    Howitzer(): position(0.0,0.0), angle(),projectile(new vector<Projectile>()){}
+    Howitzer(Position position): position(position), angle(),projectile(new vector<Projectile>()){}
 
     // Getters
     Position & getPosition();
     Angle getAngle();
-    Projectile* getProjectile();
+    vector<Projectile>* getProjectile();
 
     // Setters
     void setPosition(const Position& newPosition);
@@ -47,7 +48,7 @@ public:
 private:
     Position position;
     Angle angle;
-    Projectile * projectile;
+    vector<Projectile>* projectile;
 };
 
 

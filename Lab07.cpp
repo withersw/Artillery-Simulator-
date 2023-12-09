@@ -40,14 +40,6 @@ public:
       // Generate the ground and set the vertical position of the howitzer.
       ground.reset(howitzer.getPosition());
 
-      // This is to make the bullet travel across the screen. Notice how there are 
-      // 20 pixels, each with a different age. This gives the appearance
-      // of a trail that fades off in the distance.
-//      for (int i = 0; i < 20; i++)
-//      {
-//         projectilePath[i].setPixelsX((double)i * 2.0);
-//         projectilePath[i].setPixelsY(ptUpperRight.getPixelsY() / 1.5);
-//      }
    }
 
    bool hitTheTarget(const Position& pos) const{
@@ -57,7 +49,6 @@ public:
    }
 
    Ground ground;                 // the ground
-//   Position  projectilePath[20];  // path of the projectile
    Howitzer howitzer;
    Position  ptUpperRight;        // size of the screen
    double angle;                  // angle of the howitzer 
@@ -84,9 +75,9 @@ void callBack(const Interface* pUI, void* p)
    // move a large amount
    if (pUI->isRight())
       pDemo->howitzer.moveMuzzle(0.05);
-   if (pUI->isLeft())
-      pDemo->howitzer.moveMuzzle(-0.05);
-
+   if (pUI->isLeft()){
+       pDemo->howitzer.moveMuzzle(-0.05);
+   }
    // move by a little
    if (pUI->isUp())
       pDemo->howitzer.moveMuzzle(pDemo->howitzer.getAngle().getRadians() >= 0 ? -0.003 : 0.003);
@@ -96,58 +87,69 @@ void callBack(const Interface* pUI, void* p)
    // fire that gun
    if (pUI->isSpace()){
        pDemo->time = 0.0;
-       if (pDemo->howitzer.getProjectile() == nullptr)
+       if (pDemo->howitzer.getProjectile()->size() == 0) {
+
            pDemo->howitzer.fireProjectile();
+       }
    }
 
    //
    // perform all the game logic
    //
+    if(pDemo->howitzer.getProjectile()->size() != 0 && (*pDemo->howitzer.getProjectile()).size() < 20)
+    {
+        pDemo->howitzer.fireProjectile();
+    }
 
    // advance time by half a second.
    pDemo->time += 0.5;
-
    ogstream gout(Position(10.0, pDemo->ptUpperRight.getPixelsY() - 20.0));
+   gout.setf(ios::fixed | ios::showpoint);
+   gout.precision(3);
 
    // draw the ground first
    pDemo->ground.draw(gout);
 
    // draw the howitzer
    gout.drawHowitzer(pDemo->howitzer.getPosition(), pDemo->howitzer.getAngle().getRadians(), pDemo->time);
-
    // draw the projectile
-   if (pDemo->howitzer.getProjectile() != nullptr){
-//       for (int i = 0; i < 20; i++)
-//           gout.drawProjectile(pDemo->projectilePath[i], 0.5 * (double)i);
-       pDemo->howitzer.updateProjectilePosition();
-       if(pDemo->hitTheTarget(pDemo->howitzer.getProjectile()->getPosition())){
+   if (pDemo->howitzer.getProjectile()->size() != 0)
+   {
+       for (auto& proj : (*pDemo->howitzer.getProjectile())){
+           proj.moveProjectile();
+       }
+
+       if(pDemo->hitTheTarget((*pDemo->howitzer.getProjectile())[0].getPosition())){
            pDemo->howitzer.resetProjectile();
            pDemo->ground.reset(pDemo->howitzer.getPosition());
        }
-       else if(pDemo->ground.getElevationMeters(pDemo->howitzer.getProjectile()->getPosition()) > pDemo->howitzer.getProjectile()->getPosition().getMetersY()) {
+       else if(pDemo->ground.getElevationMeters((*pDemo->howitzer.getProjectile())[0].getPosition()) > (*pDemo->howitzer.getProjectile())[0].getPosition().getMetersY()) {
            pDemo->howitzer.resetProjectile();
        }else{
-           gout.drawProjectile(pDemo->howitzer.getProjectile()->getPosition(), 0.5 * double(1));
-//            Projectile* projectileArray = pDemo->howitzer.getProjectile();
-//           for (int i = 0; i < 20; ++i) {
-//               gout.drawProjectile(projectileArray[i].getPosition(), 0.5 * (double)i);
-//
-//           }
+           int index = 0;
+           for (auto proj : (*pDemo->howitzer.getProjectile())){
+               gout.drawProjectile(proj.getPosition(), 0.5 * double(index));
+               index++;
+           }
        }
    }
 
    // draw some text on the screen
+   if (pDemo->howitzer.getProjectile()->size() == 0){
+       double angle = pDemo->howitzer.getAngle().getDegrees();
+       if (angle > 180) {
+           angle -= 360;
+       }
 
-   if (pDemo->howitzer.getProjectile() == nullptr){
        gout.setPosition(Position(22000.0,18000.0));
-       gout << "Angle: " << pDemo->howitzer.getAngle().getDegrees() << " degree\n";
+       gout << "Angle: " << angle << " degree\n";
    }else{
        gout.setPosition(Position(20000.0,18000.0));
-       gout << "altitude: " << pDemo->howitzer.getProjectile()->getPosition().getMetersY() << "m\n";
+       gout << "altitude: " << (*pDemo->howitzer.getProjectile())[0].getPosition().getMetersY() << "m\n";
        gout.setPosition(Position(20000.0,17000.0));
-       gout << "speed: " << pDemo->howitzer.getProjectile()->getVelocity().getVelocity() << "m/s\n";
+       gout << "speed: " << (*pDemo->howitzer.getProjectile())[0].getVelocity().getVelocity() << "m/s\n";
        gout.setPosition(Position(20000.0,16000.0));
-       gout << "distance: " << abs(pDemo->howitzer.getProjectile()->getPosition().getMetersX() - pDemo->howitzer.getPosition().getMetersX()) << "m\n";
+       gout << "distance: " << abs((*pDemo->howitzer.getProjectile())[0].getPosition().getMetersX() - pDemo->howitzer.getPosition().getMetersX()) << "m\n";
        gout.setPosition(Position(20000.0,15000.0));
        gout << "hang time: " << pDemo->time << "s\n";
    }

@@ -3,6 +3,7 @@
 //
 
 #include "howitzer.h"
+#include <vector>
 
 /*
  * GETTERS
@@ -15,7 +16,7 @@ Angle Howitzer::getAngle() {
     return this->angle;
 }
 
-Projectile* Howitzer::getProjectile() {
+vector<Projectile>* Howitzer::getProjectile() {
     return this->projectile;
 }
 
@@ -31,9 +32,9 @@ void Howitzer::setAngle(const Angle& newAngle) {
     this->angle = newAngle;
 }
 
-void Howitzer::setProjectile(Projectile newProjectile) {
-    this->projectile = &newProjectile;
-}
+//void Howitzer::setProjectile(Projectile newProjectile) {
+//    this->projectile = &newProjectile;
+//}
 
 void Howitzer::setPixelX(double pixelX) {
     this->position.setPixelsX(pixelX);
@@ -57,22 +58,17 @@ void Howitzer::moveMuzzle(double radians) {
  */
 
 void Howitzer::fireProjectile() {
-    this->projectile = new Projectile[20];
-    for (int i = 0; i < 20; ++i) {
-        // Initialize each object with specific parameters
-        projectile[i] = Projectile(this->position,this->angle);
-    }
+    Projectile proj = Projectile(this->position, this->angle);
+    this->projectile->push_back(proj);
 }
 
 void Howitzer::resetProjectile() {
-    this->projectile = nullptr;
+    this->projectile->clear();
 }
 
 void Howitzer::updateProjectilePosition()
 {
-    for (int i = 0; i < 20; ++i) {
-        // Initialize each object with specific parameters
-        projectile[i].moveProjectile();
+    for(auto proj : *this->projectile){
+        proj.moveProjectile();
     }
-//    this->projectile->moveProjectile();
 }
