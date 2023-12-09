@@ -57,14 +57,12 @@ void Howitzer::moveMuzzle(double radians) {
  */
 
 void Howitzer::fireProjectile() {
-    this->projectile = new Projectile(this->position,this->angle);
+    this->projectile = new Projectile[20];
+    for (int i = 0; i < 20; ++i) {
+        // Initialize each object with specific parameters
+        projectile[i] = Projectile(this->position,this->angle);
+    }
 }
-
-//void Howitzer::checkProjectile() {
-//    if (this->projectile == nullptr){
-//        canShoot = true;
-//    }
-//}
 
 void Howitzer::resetProjectile() {
     this->projectile = nullptr;
@@ -72,5 +70,9 @@ void Howitzer::resetProjectile() {
 
 void Howitzer::updateProjectilePosition()
 {
-    this->projectile->moveProjectile();
+    for (int i = 0; i < 20; ++i) {
+        // Initialize each object with specific parameters
+        projectile[i].moveProjectile();
+    }
+//    this->projectile->moveProjectile();
 }
